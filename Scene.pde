@@ -12,6 +12,20 @@ class Vec2
    float y;
 }
 
+class Vec3
+{
+  Vec3(float x, float y, float z)
+  {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  }
+
+   float x;
+   float y;
+   float z;
+}
+
 interface Actionable
 {
   void OnInput(Character keys);
@@ -20,11 +34,13 @@ interface Actionable
 
 class Entity implements Actionable
 {
-  Entity(float x, float y, float w, float h)
+  Entity(float x, float y, float w, float h, Vec3 colour)
   {
     position = new Vec2(x, y);
     size = new Vec2(w, h);
     direction = new Vec2(0,0);
+    this.colour = colour;
+    
     accleration = new Vec2(5, 5);
     p = new Physics(this);
   }
@@ -62,15 +78,18 @@ class Entity implements Actionable
 
   void Render()
   {
-    fill(255, 0, 0);
+    fill(colour.x, colour.y, colour.z);
     rect(position.x, position.y, size.x, size.y);
   }
 
   Vec2 position;
   Vec2 size;
   Vec2 accleration;
-  Physics p;
   Vec2 direction;
+  Vec3 colour;
+  
+  Physics p;
+  
   
 }
 
@@ -201,16 +220,43 @@ class Game
   Game()
   {
     s = new Scene();
-    allEntity = new ArrayList<Entity>();
+    allBaseEntity = new ArrayList<Entity>();
+    allMidEntity = new ArrayList<Entity>();
+    allEndEntity = new ArrayList<Entity>();
   }
   
   void Load()
   {
-    Entity e = new Entity(200,200, 20, 20);
-    m.AddListener(e);
-    allEntity.add(e);
+    Entity e = new Entity(50,50, 320, 320, new Vec3(255, 0, 0));
     
-    s.AddTolayer(Layers.BASE, allEntity);
+    Entity e1 = new Entity(200,200, 20, 20, new Vec3(0, 255, 0));
+    float posX = 0;
+    float posY = 0;
+    float sizeX = 0;
+    float sizeY = 0;
+    
+    for(int i = 0; i < 10; i++)
+    {
+      sizeX = random(10, 50);
+      sizeY = random(15, 30);
+      
+      posX = random(30, 350);
+      posY = random(30, 350);
+      
+      Entity temp = new Entity(posX, posY, sizeX, sizeY, new Vec3(0, 0, 255));
+      allEndEntity.add(temp);
+      
+    }
+    
+    m.AddListener(e1);
+    
+    allBaseEntity.add(e);
+    allMidEntity.add(e1);
+    
+    
+    s.AddTolayer(Layers.BASE, allBaseEntity);
+    s.AddTolayer(Layers.MID, allMidEntity);
+    s.AddTolayer(Layers.END, allEndEntity);
   }
   
   
@@ -226,7 +272,9 @@ class Game
   
   Scene s;
   
-  ArrayList<Entity> allEntity;
+  ArrayList<Entity> allBaseEntity;
+  ArrayList<Entity> allMidEntity;
+  ArrayList<Entity> allEndEntity;
   
 }
 
